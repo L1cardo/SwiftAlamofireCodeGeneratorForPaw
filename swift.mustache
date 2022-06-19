@@ -17,7 +17,7 @@ func send{{{codeSlug}}}Request() {
     // Add Headers
     let headers: HTTPHeaders = [
     {{#headers.header_list}}
-        "{{{header_name}}}":"{{{header_value}}}",
+        "{{{header_name}}}": "{{{header_value}}}",
     {{/headers.header_list}}
     ]
 
@@ -27,7 +27,7 @@ func send{{{codeSlug}}}Request() {
     // Add URL parameters
     let urlParams = [
     {{#url.params}}
-        "{{{name}}}":"{{{value}}}",
+        "{{{name}}}": "{{{value}}}",
     {{/url.params}}
     ]
 
@@ -37,7 +37,7 @@ func send{{{codeSlug}}}Request() {
     // Form URL-Encoded Body
     let body = [
     {{#body.url_encoded_body}}
-        "{{{name}}}":"{{{value}}}",
+        "{{{name}}}": "{{{value}}}",
     {{/body.url_encoded_body}}
     ]
 
@@ -57,7 +57,7 @@ func send{{{codeSlug}}}Request() {
     // Custom Body Encoding
     struct RawDataEncoding: ParameterEncoding {
         static var `default`: RawDataEncoding { return RawDataEncoding() }
-        func encode<Parameters>(_ parameters: Parameters?, into request: URLRequest) throws -> URLRequest where Parameters : Encodable {
+        func encode<Parameters>(_ parameters: Parameters?, into request: URLRequest) throws -> URLRequest where Parameters: Encodable {
             var request = request
             {{#body.has_short_body}}
             let parameters = parameters as? String
@@ -91,7 +91,7 @@ func send{{{codeSlug}}}Request() {
     // Fetch Request
     {{#timeout}}session{{/timeout}}{{^timeout}}AF{{/timeout}}.upload(multipartFormData: { multipartFormData in
         {{#body.multipart_body}}
-            multipartFormData.append(Data("{{{value}}}".utf8), withName :"{{{name}}}")
+            multipartFormData.append(Data("{{{value}}}".utf8), withName: "{{{name}}}")
         {{/body.multipart_body}}
         }, to: "{{{url.fullpath}}}", method: .{{{method}}}{{#headers.has_headers}}, headers: headers{{/headers.has_headers}})
         .response { response in
