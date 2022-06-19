@@ -1,5 +1,5 @@
 {
-  "name": "Paw-SwiftAlamofireCodeGenerator",
+  "name": "SwiftAlamofireCodeGeneratorForPaw",
   "version": "1.2.0",
   "devDependencies": {
     "coffee-script": "latest",

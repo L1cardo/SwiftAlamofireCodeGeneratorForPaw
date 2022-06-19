@@ -144,9 +144,9 @@ SwiftAlamofireCodeGenerator = ->
 
 
 SwiftAlamofireCodeGenerator.identifier =
-    "com.luckymarmot.PawExtensions.SwiftAlamofireCodeGenerator"
+    "com.licardo.PawExtensions.SwiftAlamofireCodeGenerator"
 SwiftAlamofireCodeGenerator.title =
-    "Swift (Alamofire)"
+    "Swift 5 (Alamofire) by Licardo"
 SwiftAlamofireCodeGenerator.fileExtension = "swift"
 SwiftAlamofireCodeGenerator.languageHighlighter = "swift"
 
