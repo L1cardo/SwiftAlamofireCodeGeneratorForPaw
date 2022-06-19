@@ -1,0 +1,106 @@
+func send{{{codeSlug}}}Request() {
+    /**
+     {{{request.name}}}
+     {{{method}}} {{{url.base}}}
+     */
+
+    {{! ----- Timeout ----- }}
+    {{#timeout}}
+    // Add timeout
+    let configuration = URLSessionConfiguration.af.default
+    configuration.timeoutIntervalForRequest = {{{timeout}}}
+    let session = Session(configuration: configuration)
+
+    {{/timeout}}
+    {{! ----- Headers ----- }}
+    {{#headers.has_headers}}
+    // Add Headers
+    let headers: HTTPHeaders = [
+    {{#headers.header_list}}
+        "{{{header_name}}}":"{{{header_value}}}",
+    {{/headers.header_list}}
+    ]
+
+    {{/headers.has_headers}}
+    {{! ----- URL Parameters ----- }}
+    {{#has_params_to_encode}}
+    // Add URL parameters
+    let urlParams = [
+    {{#url.params}}
+        "{{{name}}}":"{{{value}}}",
+    {{/url.params}}
+    ]
+
+    {{/has_params_to_encode}}
+    {{! ----- Form URL-Encoded Body ----- }}
+    {{#body.has_url_encoded_body}}
+    // Form URL-Encoded Body
+    let body = [
+    {{#body.url_encoded_body}}
+        "{{{name}}}":"{{{value}}}",
+    {{/body.url_encoded_body}}
+    ]
+
+    {{/body.has_url_encoded_body}}
+    {{! ----- JSON Body ----- }}
+    {{#body.has_json_body}}
+    // JSON Body
+    {{{body.json_body_object}}}
+
+    {{/body.has_json_body}}
+    {{! ----- Request ----- }}
+    {{^body.has_multipart_body}}
+    {{#body.has_raw_body}}
+    // Raw Body
+    let body = "{{{body.short_body}}}"
+
+    // Custom Body Encoding
+    struct RawDataEncoding: ParameterEncoding {
+        static var `default`: RawDataEncoding { return RawDataEncoding() }
+        func encode<Parameters>(_ parameters: Parameters?, into request: URLRequest) throws -> URLRequest where Parameters : Encodable {
+            var request = request
+            {{#body.has_short_body}}
+            let parameters = parameters as? String
+            request.httpBody = parameters?.data(using: .utf8)
+            {{/body.has_short_body}}
+            {{^body.has_short_body}}
+            request.httpBody = nil // set your body data here
+            {{/body.has_short_body}}
+            return request
+        }
+    }
+    
+    {{/body.has_raw_body}}
+    // Fetch Request
+    {{#timeout}}session{{/timeout}}{{^timeout}}AF{{/timeout}}.request({{#has_params_to_encode}}"{{{url.base}}}"{{/has_params_to_encode}}{{^has_params_to_encode}}"{{{url.fullpath}}}"{{/has_params_to_encode}}, method: .{{{method}}}{{#body}}, parameters: body{{/body}}{{#body.has_raw_body}}, encoder: RawDataEncoding.default{{/body.has_raw_body}}{{^body}}{{#has_params_to_encode}}, parameters: urlParams{{/has_params_to_encode}}{{/body}}{{#body.has_json_body}}, encoder: JSONParameterEncoder.default{{/body.has_json_body}}{{#body.has_url_encoded_body}}, encoder: URLEncodedFormParameterEncoder(destination: .httpBody){{/body.has_url_encoded_body}}{{#headers.has_headers}}, headers: headers{{/headers.has_headers}})
+    {{#httpBasicAuth}}
+        .authenticate(user: "{{httpBasicAuth.username}}", password: "{{httpBasicAuth.password}}")
+    {{/httpBasicAuth}}
+        .validate()
+        .responseJSON { response in
+            switch response.result {
+            case .success(let json):
+                debugPrint("HTTP Response Body: \(json)")
+            case .failure(let error):
+                print("HTTP Request failed: \(error.localizedDescription)")
+            }
+        }
+    {{/body.has_multipart_body}}
+    {{! ----- Upload (Multipart) ----- }}
+    {{#body.has_multipart_body}}
+    // Fetch Request
+    {{#timeout}}session{{/timeout}}{{^timeout}}AF{{/timeout}}.upload(multipartFormData: { multipartFormData in
+        {{#body.multipart_body}}
+            multipartFormData.append(Data("{{{value}}}".utf8), withName :"{{{name}}}")
+        {{/body.multipart_body}}
+        }, to: "{{{url.fullpath}}}", method: .{{{method}}}{{#headers.has_headers}}, headers: headers{{/headers.has_headers}})
+        .response { response in
+            switch response.result {
+            case .success(let result):
+                debugPrint("HTTP Response Body: \(String(data: result!, encoding: .utf8)!)")
+            case .failure(let error):
+                print("HTTP Request failed: \(error.localizedDescription)")
+            }
+        }
+    {{/body.has_multipart_body}}
+}
