@@ -1,6 +1,6 @@
 # Swift 5 + Alamofire Code Generator (Paw Extension)
 
-![build status](https://github.com/l1cardo/SwiftAlamofireCodeGeneratorForPaw/actions/workflows/build.yml/badge.svg)
+[![Build Code Generator](https://github.com/L1cardo/SwiftAlamofireCodeGeneratorForPaw/actions/workflows/build.yml/badge.svg)](https://github.com/L1cardo/SwiftAlamofireCodeGeneratorForPaw/actions/workflows/build.yml)
 
 A [Paw Extension](https://paw.cloud/extensions/) that generates Swift 5 code for the [Alamofire 5](https://github.com/Alamofire/Alamofire) library.
 ## Note
